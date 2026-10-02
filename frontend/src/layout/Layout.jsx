@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, GraduationCap, Sparkles, Settings, LogOut, Menu, X, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Sparkles, Settings, LogOut, Menu, X, Bell, ClipboardList, Megaphone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/ThemeToggle';
 import Footer from '../components/Footer';
@@ -9,6 +9,8 @@ const nav = [
   ['Dashboard', LayoutDashboard, '/'],
   ['Employees', Users, '/employees'],
   ['Interns', GraduationCap, '/interns'],
+  ['Tasks', ClipboardList, '/tasks'],
+  ['Announcements', Megaphone, '/announcements'],
   ['AI Assistant', Sparkles, '/assistant'],
   ['Settings', Settings, '/settings']
 ];
@@ -80,9 +82,15 @@ export default function Layout({ user, logout, isDark, toggleDark }) {
       <main className="flex-1 min-w-0 flex flex-col relative z-10">
         <div className="lg:hidden p-4 flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
            <img src="/reude-logo.png" className="h-8 dark:invert" alt="Logo" />
-           <button className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" onClick={() => setMobile(true)}>
-             <Menu size={20} className="text-slate-600 dark:text-slate-300"/>
-           </button>
+           <div className="flex items-center gap-3">
+             <button className="relative p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500">
+               <Bell size={18} />
+               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+             </button>
+             <button className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" onClick={() => setMobile(true)}>
+               <Menu size={20} className="text-slate-600 dark:text-slate-300"/>
+             </button>
+           </div>
         </div>
         
         <div className="p-6 lg:p-10 flex-1 overflow-auto relative">

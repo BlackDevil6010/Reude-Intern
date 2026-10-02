@@ -1,5 +1,5 @@
 const INITIAL_DATA = {
-  version: 2, // Bump version to force reset localstorage
+  version: 4, // Bump version to force reset localstorage
   users: [
     { id: '1', username: 'Deepak Raj', role: 'Employee', display: 'Deepak Raj', status: 'Active' },
     { id: 'admin', username: 'admin', role: 'Admin', display: 'System Admin', status: 'Active' }
@@ -45,16 +45,23 @@ const INITIAL_DATA = {
     }
   ],
   interns: [
-    { id: 1, intern_id: "INT001", name: "Priyadharshini", department: "IT", status: "Active" },
-    { id: 2, intern_id: "INT002", name: "Yugeswaran", department: "IT", status: "Active" },
-    { id: 3, intern_id: "INT003", name: "Dhanushraj", department: "IT", status: "Active" },
-    { id: 4, intern_id: "INT004", name: "Kavin Kumar", department: "IT", status: "Active" },
-    { id: 5, intern_id: "INT005", name: "Karthikeyan", department: "IT", status: "Active" },
-    { id: 6, intern_id: "INT006", name: "Sugapriya", department: "CSE", status: "Active" }
+    { id: 1, intern_id: "INT001", name: "Priyadharshini", department: "Full Stack Developer intern", status: "Active", email: "32priyadharshini@gmail.com", skills: "HTML, Git", duration: "3 months", working_mode: "remote", place: "Coimbatore", supervisor: "Deepak Raj", task_assigned: "Sales and inventory", start_date: "2026-09-01", end_date: "2026-12-01" },
+    { id: 2, intern_id: "INT002", name: "Yugeswaran", department: "Full Stack Developer intern", status: "Active", email: "yugeshdhanasekaran@gmail.com", skills: "React.js", duration: "3 months", working_mode: "onsite", place: "Chennai", supervisor: "Deepak Raj", task_assigned: "Build user dashboard", start_date: "2026-08-15", end_date: "2026-11-15" },
+    { id: 3, intern_id: "INT003", name: "Dhanushraj", department: "Full Stack Developer intern", status: "Active", email: "dhanushrajshiva123@gmail.com", skills: "React.js", duration: "3 months", working_mode: "hybrid", place: "Bangalore", supervisor: "Deepak Raj", task_assigned: "API integration", start_date: "2026-09-10", end_date: "2026-12-10" },
+    { id: 4, intern_id: "INT004", name: "Kavin Kumar", department: "Full Stack Developer intern", status: "Active", email: "kavinkumars.tech@gmail.com", skills: "React, Python, Java, SQL, MongoDB, Git", duration: "3 months", working_mode: "remote", place: "Coimbatore", supervisor: "Deepak Raj", task_assigned: "Database schema design", start_date: "2026-07-01", end_date: "2026-10-01" },
+    { id: 5, intern_id: "INT005", name: "Karthikeyan", department: "Full Stack Developer intern", status: "Active", email: "karthikeyan2430s@gmail.com", skills: "Git", duration: "3 months", working_mode: "onsite", place: "Chennai", supervisor: "Deepak Raj", task_assigned: "Bug fixing", start_date: "2026-09-20", end_date: "2026-12-20" },
+    { id: 6, intern_id: "INT006", name: "Sugapriya", department: "Full Stack Developer intern", status: "Active", email: "sugapriyaarivalagan@gmail.com", skills: "React.js", duration: "3 months", working_mode: "remote", place: "Madurai", supervisor: "Deepak Raj", task_assigned: "Component styling", start_date: "2026-09-05", end_date: "2026-12-05" }
   ],
   activity: [
     { id: 1, username: 'Deepak Raj', action: 'Logged into the system', created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString() },
     { id: 2, username: 'Admin', action: 'System updated', created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString() }
+  ],
+  tasks: [
+    { id: 1, title: 'Setup backend DB', description: 'Create SQLite schema and migrate', status: 'In Progress', assignee: 'Deepak', deadline: '2026-10-01' },
+    { id: 2, title: 'Review Intern Resumes', description: 'Check skills for new hires', status: 'To Do', assignee: 'Admin', deadline: '2026-10-05' }
+  ],
+  announcements: [
+    { id: 1, title: 'Company Holiday', content: 'Office closed this Friday for regional holiday.', date: new Date().toISOString().split('T')[0], priority: 'High' }
   ]
 };
 
@@ -86,7 +93,9 @@ export const db = {
         users: data?.users || INITIAL_DATA.users,
         employees: data?.employees || INITIAL_DATA.employees,
         interns: data?.interns || INITIAL_DATA.interns,
-        activity: data?.activity || INITIAL_DATA.activity
+        activity: data?.activity || INITIAL_DATA.activity,
+        tasks: data?.tasks || INITIAL_DATA.tasks,
+        announcements: data?.announcements || INITIAL_DATA.announcements
       };
     } catch {
       return INITIAL_DATA;
@@ -96,7 +105,7 @@ export const db = {
     localStorage.setItem('erp_data', JSON.stringify(data));
   },
   login(user, pass) {
-    if (user === 'admin' && pass === 'password') {
+    if (user === 'admin' && (pass === 'Reude@Admin$2026' || pass === 'ChangeMe!2026')) {
       return { token: 'mock-jwt-token-admin', user: INITIAL_DATA.users[1] };
     }
     const emp = this.getData().employees.find(e => e.first_name.toLowerCase() === user.toLowerCase());
@@ -129,7 +138,8 @@ export const db = {
   addEmployee(newEmp) {
     const data = this.getData();
     const id = data.employees.length > 0 ? Math.max(...data.employees.map(e => e.id)) + 1 : 1;
-    data.employees.push({ ...newEmp, id });
+    const employee_id = `EMP${String(id).padStart(3, '0')}`;
+    data.employees.push({ ...newEmp, id, employee_id });
     this.saveData(data);
     return data.employees;
   },
@@ -139,7 +149,8 @@ export const db = {
   addIntern(newIntern) {
     const data = this.getData();
     const id = data.interns.length > 0 ? Math.max(...data.interns.map(i => i.id)) + 1 : 1;
-    data.interns.push({ ...newIntern, id });
+    const intern_id = `INT${String(id).padStart(3, '0')}`;
+    data.interns.push({ ...newIntern, id, intern_id });
     this.saveData(data);
     return data.interns;
   },
@@ -156,6 +167,72 @@ export const db = {
   deleteIntern(id) {
     const data = this.getData();
     data.interns = data.interns.filter(i => i.id !== id);
+    this.saveData(data);
+    return data.interns;
+  },
+  getTasks() { return this.getData().tasks; },
+  addTask(t) {
+    const data = this.getData();
+    const id = data.tasks.length > 0 ? Math.max(...data.tasks.map(x => x.id)) + 1 : 1;
+    data.tasks.push({ ...t, id });
+    this.saveData(data);
+    return data.tasks;
+  },
+  updateTaskStatus(id, status) {
+    const data = this.getData();
+    const i = data.tasks.findIndex(x => x.id === id);
+    if (i !== -1) { data.tasks[i].status = status; this.saveData(data); }
+    return data.tasks;
+  },
+  updateTask(id, updates) {
+    const data = this.getData();
+    const i = data.tasks.findIndex(x => x.id === id);
+    if (i !== -1) { data.tasks[i] = { ...data.tasks[i], ...updates }; this.saveData(data); }
+    return data.tasks;
+  },
+  deleteTask(id) {
+    const data = this.getData();
+    data.tasks = data.tasks.filter(x => x.id !== id);
+    this.saveData(data);
+    return data.tasks;
+  },
+  getAnnouncements() { return this.getData().announcements; },
+  addAnnouncement(a) {
+    const data = this.getData();
+    const id = data.announcements.length > 0 ? Math.max(...data.announcements.map(x => x.id)) + 1 : 1;
+    data.announcements.unshift({ ...a, id, date: new Date().toISOString().split('T')[0] });
+    this.saveData(data);
+    return data.announcements;
+  },
+  deleteAnnouncement(id) {
+    const data = this.getData();
+    data.announcements = data.announcements.filter(x => x.id !== id);
+    this.saveData(data);
+    return data.announcements;
+  },
+  convertInternToEmployee(internId) {
+    const data = this.getData();
+    const intern = data.interns.find(i => i.id === internId);
+    if (!intern) return data;
+    
+    // Add to employees
+    const empId = data.employees.length > 0 ? Math.max(...data.employees.map(e => e.id)) + 1 : 1;
+    const employee_id = `EMP${String(empId).padStart(3, '0')}`;
+    data.employees.push({
+      id: empId,
+      employee_id,
+      first_name: intern.name.split(' ')[0],
+      last_name: intern.name.split(' ').slice(1).join(' ') || '',
+      department: intern.department,
+      designation: 'Junior ' + intern.department,
+      work_email: intern.email || '',
+      employment_type: 'Full-time',
+      employment_status: 'Active',
+      skills: intern.skills || ''
+    });
+    
+    // Remove from interns
+    data.interns = data.interns.filter(i => i.id !== internId);
     this.saveData(data);
     return data.interns;
   },

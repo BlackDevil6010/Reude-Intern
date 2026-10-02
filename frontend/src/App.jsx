@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import Interns from './pages/Interns';
+import Tasks from './pages/Tasks';
+import Announcements from './pages/Announcements';
 import AIAssistant from './pages/AIAssistant';
 import SettingsPage from './pages/Settings';
 
@@ -54,6 +56,8 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="employees" element={<Employees />} />
         <Route path="interns" element={<Interns />} />
+        <Route path="tasks" element={<Tasks />} />
+        <Route path="announcements" element={<Announcements />} />
         <Route path="assistant" element={<AIAssistant />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

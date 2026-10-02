@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '../db';
 import Section from '../components/Section';
-import { Plus, Search, MessageCircle, ArrowUpDown, X, Save } from 'lucide-react';
+import { Plus, Search, ClipboardList, CheckCircle, ArrowUpDown, X, Save, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   flexRender,
@@ -19,13 +19,41 @@ export default function Employees() {
   const [globalFilter, setGlobalFilter] = useState(searchParams.get('status') || '');
   const [sorting, setSorting] = useState([]);
   const [adding, setAdding] = useState(false);
+  const [todoModal, setTodoModal] = useState(null);
+  const [empTasks, setEmpTasks] = useState([]);
+  const [newTask, setNewTask] = useState({ title: '', description: '' });
   const [newEmp, setNewEmp] = useState({ first_name: '', last_name: '', work_email: '', department: '', designation: '', employment_type: 'Full-time', employment_status: 'Active' });
 
   useEffect(() => {
     setData(db.getEmployees());
-  }, []);
+    if (todoModal) {
+      const allTasks = db.getTasks();
+      setEmpTasks(allTasks.filter(t => t.assignee === todoModal.first_name));
+    }
+  }, [todoModal]);
+
+  const handleAssignTask = (e) => {
+    e.preventDefault();
+    if (!newTask.title) return;
+    db.addTask({
+      title: newTask.title,
+      description: newTask.description,
+      status: 'To Do',
+      assignee: todoModal.first_name,
+      deadline: new Date().toISOString().split('T')[0],
+      acknowledged: false
+    });
+    setNewTask({ title: '', description: '' });
+    setEmpTasks(db.getTasks().filter(t => t.assignee === todoModal.first_name));
+  };
+
+  const handleAcknowledge = (taskId) => {
+    db.updateTask(taskId, { acknowledged: true });
+    setEmpTasks(db.getTasks().filter(t => t.assignee === todoModal.first_name));
+  };
 
   const columns = [
+    { accessorKey: 'employee_id', header: 'ID', cell: info => <span className="font-mono text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{info.getValue() || 'N/A'}</span> },
     {
       accessorKey: 'first_name',
       header: 'Employee',
@@ -55,10 +83,14 @@ export default function Employees() {
     },
     {
       id: 'actions',
-      header: '',
-      cell: () => (
-        <button className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-reude transition-colors">
-          <MessageCircle size={18}/>
+      header: 'To-Do',
+      cell: info => (
+        <button 
+          onClick={() => setTodoModal(info.row.original)}
+          title="Assign To-Do"
+          className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-reude transition-colors"
+        >
+          <ClipboardList size={18}/>
         </button>
       )
     }
@@ -89,7 +121,19 @@ export default function Employees() {
     <Section 
       title="Employees" 
       subtitle="Manage your workforce data using TanStack Table." 
-      action={<button onClick={() => setAdding(true)} className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-reude text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all flex items-center gap-2"><Plus size={18}/> Add Employee</button>}
+      action={
+        <div className="flex gap-3">
+          <label className="cursor-pointer px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2">
+            <Upload size={18}/> Upload Excel
+            <input type="file" accept=".xlsx, .xls" className="hidden" onChange={(e) => {
+              if(e.target.files.length > 0) alert('Excel upload logic will be implemented here');
+            }} />
+          </label>
+          <button onClick={() => setAdding(true)} className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-reude text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all flex items-center gap-2">
+            <Plus size={18}/> Add Employee
+          </button>
+        </div>
+      }
     >
       <div className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 p-6 rounded-[2rem] shadow-xl shadow-slate-200/40 dark:shadow-none">
         
@@ -182,6 +226,51 @@ export default function Employees() {
                 <button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-reude text-white rounded-xl py-3 font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all flex items-center justify-center gap-2 mt-4">
                   <Plus size={18} /> Create Employee
                 </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {todoModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setTodoModal(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 w-full max-w-lg relative z-10 shadow-2xl">
+              <button onClick={() => setTodoModal(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+              <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">To-Do List: {todoModal.first_name}</h2>
+              <p className="text-sm text-slate-500 mb-6">Assign work (e.g. if you are taking leave) or check status.</p>
+              
+              <div className="max-h-[40vh] overflow-y-auto mb-6 space-y-3">
+                {empTasks.length === 0 ? (
+                  <div className="text-slate-400 text-sm text-center py-4">No tasks assigned yet.</div>
+                ) : (
+                  empTasks.map(t => (
+                    <div key={t.id} className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-start gap-4">
+                      <div>
+                        <h4 className="font-bold text-slate-800 dark:text-white text-sm">{t.title}</h4>
+                        <p className="text-xs text-slate-500 mt-1">{t.description}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-2 shrink-0">
+                        <span className={`text-xs px-2 py-1 rounded-md font-bold \${t.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>{t.status}</span>
+                        {t.acknowledged ? (
+                          <span className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle size={12}/> Seen</span>
+                        ) : (
+                          <button onClick={() => handleAcknowledge(t.id)} className="text-xs bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-2 py-1 rounded-md transition-colors">Mark Seen</button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <form onSubmit={handleAssignTask} className="border-t border-slate-100 dark:border-white/10 pt-6">
+                <h3 className="font-bold text-sm mb-3 text-slate-800 dark:text-white">Assign New Task</h3>
+                <input required value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} placeholder="Task Title (e.g. Please handle my shift)" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:border-reude text-slate-800 dark:text-white" />
+                <textarea value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} placeholder="Details..." className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:border-reude h-20 resize-none text-slate-800 dark:text-white" />
+                <button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-reude text-white rounded-xl py-2.5 font-bold text-sm shadow-md shadow-orange-500/20 hover:shadow-orange-500/40 transition-all">Assign Task</button>
               </form>
             </motion.div>
           </div>
