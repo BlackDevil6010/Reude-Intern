@@ -20,7 +20,7 @@ export default function Layout({ user, logout, isDark, toggleDark }) {
   const navigate = useNavigate();
   
   const isAdmin = ['Admin', 'HR', 'Manager', 'Team Lead'].includes(user.role);
-  const allowed = nav.filter(([n]) => isAdmin || ['Dashboard', 'Settings'].includes(n));
+  const allowed = nav.filter(([n]) => isAdmin || ['Dashboard', 'Employees', 'Interns', 'Tasks', 'Settings'].includes(n));
 
   return (
     <div className="h-screen flex bg-slate-50/50 dark:bg-[#0b1121] transition-colors duration-300 overflow-hidden relative">

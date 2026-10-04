@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Section from '../components/Section';
 
 export default function Interns() {
+  const user = JSON.parse(localStorage.getItem('reude_user') || '{}');
+  const isAdmin = ['Admin', 'HR', 'Manager', 'Team Lead'].includes(user?.role);
   const [rows, setRows] = useState([]);
   const [editing, setEditing] = useState(null);
   const [adding, setAdding] = useState(false);
   const [viewingResume, setViewingResume] = useState(null);
   const [employees, setEmployees] = useState([]);
-  const [newIntern, setNewIntern] = useState({ name: '', department: '', status: 'Active', email: '', skills: '', start_date: '', end_date: '', performance: 0, duration: '', working_mode: 'onsite', place: '', task_assigned: '', supervisor: '' });
+  const [newIntern, setNewIntern] = useState({ name: '', department: '', status: 'Active', email: '', skills: '', start_date: '', end_date: '', performance: 0, duration: '', working_mode: 'onsite', place: '', task_assigned: '', supervisor: '', dob: '', gender: 'Male' });
 
   useEffect(() => {
     setRows(db.getInterns());
@@ -44,7 +46,7 @@ export default function Interns() {
     const updatedRows = db.addIntern(newIntern);
     setRows(updatedRows);
     setAdding(false);
-    setNewIntern({ name: '', department: '', status: 'Active', email: '', skills: '', start_date: '', end_date: '', performance: 0, duration: '', working_mode: 'onsite', place: '', task_assigned: '', supervisor: '' });
+    setNewIntern({ name: '', department: '', status: 'Active', email: '', skills: '', start_date: '', end_date: '', performance: 0, duration: '', working_mode: 'onsite', place: '', task_assigned: '', supervisor: '', dob: '', gender: 'Male' });
   };
 
   const calculateProgress = (start, end) => {
@@ -67,54 +69,11 @@ export default function Interns() {
       title="Intern Management" 
       subtitle="Comprehensive tracking, performance, and conversion workflow."
       action={
+        isAdmin && (
         <div className="flex gap-3">
-          <label className="cursor-pointer bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl px-5 py-2.5 font-bold shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2 text-sm">
-            <Upload size={18}/> Parse Resume
-            <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => {
-              const file = e.target.files[0];
-              if(file) {
-                const textReader = new FileReader();
-                textReader.onload = (evtText) => {
-                  const text = evtText.target.result;
-                  
-                  const urlReader = new FileReader();
-                  urlReader.onload = (evtUrl) => {
-                    const dataUrl = evtUrl.target.result;
-                    
-                    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-                    const email = emailMatch ? emailMatch[0] : '';
-                    const allSkills = ['React', 'Node', 'Python', 'Java', 'SQL', 'MongoDB', 'JavaScript', 'HTML', 'CSS', 'Tailwind', 'Express', 'TypeScript', 'Next.js', 'Git'];
-                    const foundSkills = allSkills.filter(s => new RegExp(s, 'i').test(text));
-                    
-                    const newIntern = {
-                      name: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
-                      department: 'Full Stack Developer intern',
-                      status: 'Active',
-                      email: email,
-                      skills: foundSkills.join(', '),
-                      start_date: new Date().toISOString().split('T')[0],
-                      end_date: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0],
-                      performance: 0,
-                      resume_uploaded: true,
-                      resume_url: dataUrl
-                    };
-                    
-                    try {
-                      const updatedRows = db.addIntern(newIntern);
-                      setRows(updatedRows);
-                    } catch (err) {
-                      alert("Error saving resume (file might be too large for local storage prototype).");
-                    }
-                  };
-                  urlReader.readAsDataURL(file);
-                };
-                textReader.readAsText(file);
-              }
-              e.target.value = null;
-            }} />
-          </label>
           <button onClick={() => setAdding(true)} className="btn-primary"><Plus size={18}/> Add Intern</button>
         </div>
+        )
       }
     >
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -151,6 +110,8 @@ export default function Interns() {
                 <div className="flex items-center gap-2"><div className="w-20 font-semibold">Mode:</div> {x.working_mode || '—'} {x.place ? `(${x.place})` : ''}</div>
                 <div className="flex items-center gap-2"><div className="w-20 font-semibold">Supervisor:</div> {x.supervisor || '—'}</div>
                 <div className="flex items-center gap-2"><div className="w-20 font-semibold">Task:</div> <div className="truncate">{x.task_assigned || '—'}</div></div>
+                <div className="flex items-center gap-2"><div className="w-20 font-semibold">Gender:</div> {x.gender || '—'}</div>
+                <div className="flex items-center gap-2"><div className="w-20 font-semibold">DOB:</div> {x.dob || '—'}</div>
                 {x.performance > 0 && (
                   <div className="flex items-center gap-2">
                     <div className="w-20 font-semibold">Rating:</div> 
@@ -167,47 +128,44 @@ export default function Interns() {
                 )}
               </div>
               
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center gap-2 flex-wrap">
-                <label className="cursor-pointer flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10">
-                  <Upload size={14} /> Resume
-                  <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => {
-                    const file = e.target.files[0];
-                    if(file) {
-                      const textReader = new FileReader();
-                      textReader.onload = (evtText) => {
-                        const text = evtText.target.result;
-                        
-                        const urlReader = new FileReader();
-                        urlReader.onload = (evtUrl) => {
-                          const dataUrl = evtUrl.target.result;
-                          
-                          const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-                          const email = emailMatch ? emailMatch[0] : x.email;
-                          const allSkills = ['React', 'Node', 'Python', 'Java', 'SQL', 'MongoDB', 'JavaScript', 'HTML', 'CSS', 'Tailwind', 'Express', 'TypeScript', 'Next.js', 'Git'];
-                          const foundSkills = allSkills.filter(s => new RegExp(s, 'i').test(text));
-                          const skills = foundSkills.length > 0 ? foundSkills.join(', ') : x.skills;
-                          
-                          try {
-                            const updated = db.updateIntern(x.id, { 
-                              resume_uploaded: true,
-                              resume_url: dataUrl,
-                              email: email,
-                              skills: skills,
-                              department: 'Full Stack Developer intern'
-                            });
-                            setRows(updated);
-                          } catch (err) {
-                            alert("Error saving resume (file might be too large for local storage prototype).");
-                          }
+              {isAdmin && (
+                <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center gap-2 flex-wrap">
+                                  <label className="cursor-pointer flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10">
+                    <Upload size={14} /> Resume
+                    <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => {
+                      const file = e.target.files[0];
+                      if(file) {
+                        const textReader = new FileReader();
+                        textReader.onload = (evtText) => {
+                          const text = evtText.target.result;
+                          const urlReader = new FileReader();
+                          urlReader.onload = (evtUrl) => {
+                            const dataUrl = evtUrl.target.result;
+                            const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                            const email = emailMatch ? emailMatch[0] : x.email;
+                            const allSkills = ['React', 'Node', 'Python', 'Java', 'SQL', 'MongoDB', 'JavaScript', 'HTML', 'CSS', 'Tailwind', 'Express', 'TypeScript', 'Next.js', 'Git'];
+                            const foundSkills = allSkills.filter(s => new RegExp(s, 'i').test(text));
+                            const skills = foundSkills.length > 0 ? foundSkills.join(', ') : x.skills;
+                            try {
+                              const updated = db.updateIntern(x.id, { 
+                                resume_uploaded: true,
+                                resume_url: dataUrl,
+                                email: email,
+                                skills: skills
+                              });
+                              setRows(updated);
+                            } catch (err) {
+                              alert("Error saving resume");
+                            }
+                          };
+                          urlReader.readAsDataURL(file);
                         };
-                        urlReader.readAsDataURL(file);
-                      };
-                      textReader.readAsText(file);
-                    }
-                    e.target.value = null;
-                  }} />
-                </label>
-                <button onClick={() => setEditing({ ...x })} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-reude transition-colors px-2 py-1.5 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-800">
+                        textReader.readAsText(file);
+                      }
+                      e.target.value = null;
+                    }} />
+                  </label>
+                  <button onClick={() => setEditing({ ...x })} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-reude transition-colors px-2 py-1.5 rounded-lg hover:bg-orange-50 dark:hover:bg-slate-800">
                   <Edit size={14} /> Edit
                 </button>
                 <button onClick={() => handleConvert(x.id)} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10">
@@ -217,6 +175,7 @@ export default function Interns() {
                   <Trash2 size={14} /> Remove
                 </button>
               </div>
+              )}
             </motion.div>
           );
         })}
@@ -315,6 +274,21 @@ export default function Interns() {
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Task Assign</label>
                   <input value={(editing || newIntern).task_assigned || ''} onChange={e => editing ? setEditing({...editing, task_assigned: e.target.value}) : setNewIntern({...newIntern, task_assigned: e.target.value})} className="input" placeholder="e.g. Setup backend DB" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Date of Birth</label>
+                    <input type="date" value={(editing || newIntern).dob || ''} onChange={e => editing ? setEditing({...editing, dob: e.target.value}) : setNewIntern({...newIntern, dob: e.target.value})} className="input" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Gender</label>
+                    <select value={(editing || newIntern).gender || 'Male'} onChange={e => editing ? setEditing({...editing, gender: e.target.value}) : setNewIntern({...newIntern, gender: e.target.value})} className="input pr-8">
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                 </div>
 
                 <button type="submit" className="w-full btn-primary py-3 mt-4">

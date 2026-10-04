@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '../db';
 import Section from '../components/Section';
-import { Plus, Search, ClipboardList, CheckCircle, ArrowUpDown, X, Save, Upload } from 'lucide-react';
+import { Plus, Search, ClipboardList, CheckCircle, ArrowUpDown, X, Save, Upload, GraduationCap, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   flexRender,
@@ -14,12 +14,16 @@ import {
 } from '@tanstack/react-table';
 
 export default function Employees() {
+  const user = JSON.parse(localStorage.getItem('reude_user') || '{}');
+  const isAdmin = ['Admin', 'HR', 'Manager', 'Team Lead'].includes(user?.role);
   const [data, setData] = useState([]);
   const [searchParams] = useSearchParams();
   const [globalFilter, setGlobalFilter] = useState(searchParams.get('status') || '');
   const [sorting, setSorting] = useState([]);
   const [adding, setAdding] = useState(false);
   const [todoModal, setTodoModal] = useState(null);
+  const [supervisorModal, setSupervisorModal] = useState(null);
+  const [supervisedInterns, setSupervisedInterns] = useState([]);
   const [empTasks, setEmpTasks] = useState([]);
   const [newTask, setNewTask] = useState({ title: '', description: '' });
   const [newEmp, setNewEmp] = useState({ first_name: '', last_name: '', work_email: '', department: '', designation: '', employment_type: 'Full-time', employment_status: 'Active' });
@@ -30,7 +34,20 @@ export default function Employees() {
       const allTasks = db.getTasks();
       setEmpTasks(allTasks.filter(t => t.assignee === todoModal.first_name));
     }
-  }, [todoModal]);
+    if (supervisorModal) {
+      const allInterns = db.getInterns();
+      const empName = [supervisorModal.first_name, supervisorModal.last_name].filter(Boolean).join(' ');
+      setSupervisedInterns(allInterns.filter(i => i.supervisor === empName));
+    }
+  }, [todoModal, supervisorModal]);
+
+  const handleUpdateInternRating = (internId, rating) => {
+    db.updateIntern(internId, { performance: rating });
+    // Refresh interns list
+    const allInterns = db.getInterns();
+    const empName = [supervisorModal.first_name, supervisorModal.last_name].filter(Boolean).join(' ');
+    setSupervisedInterns(allInterns.filter(i => i.supervisor === empName));
+  };
 
   const handleAssignTask = (e) => {
     e.preventDefault();
@@ -83,15 +100,24 @@ export default function Employees() {
     },
     {
       id: 'actions',
-      header: 'To-Do',
+      header: 'Manage',
       cell: info => (
-        <button 
-          onClick={() => setTodoModal(info.row.original)}
-          title="Assign To-Do"
-          className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-reude transition-colors"
-        >
-          <ClipboardList size={18}/>
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setTodoModal(info.row.original)}
+            title="Assign To-Do"
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-reude transition-colors"
+          >
+            <ClipboardList size={18}/>
+          </button>
+          <button 
+            onClick={() => setSupervisorModal(info.row.original)}
+            title="Supervise Interns"
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-orange-500 transition-colors"
+          >
+            <GraduationCap size={18}/>
+          </button>
+        </div>
       )
     }
   ];
@@ -272,6 +298,56 @@ export default function Employees() {
                 <textarea value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} placeholder="Details..." className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:border-reude h-20 resize-none text-slate-800 dark:text-white" />
                 <button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-reude text-white rounded-xl py-2.5 font-bold text-sm shadow-md shadow-orange-500/20 hover:shadow-orange-500/40 transition-all">Assign Task</button>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {supervisorModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSupervisorModal(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 w-full max-w-2xl relative z-10 shadow-2xl">
+              <button onClick={() => setSupervisorModal(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+              <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">Supervise Interns</h2>
+              <p className="text-sm text-slate-500 mb-6">Interns reporting to {[supervisorModal.first_name, supervisorModal.last_name].filter(Boolean).join(' ')}</p>
+              
+              <div className="max-h-[50vh] overflow-y-auto mb-2 space-y-4">
+                {supervisedInterns.length === 0 ? (
+                  <div className="text-slate-400 text-sm text-center py-8">No interns assigned to this supervisor.</div>
+                ) : (
+                  supervisedInterns.map(i => (
+                    <div key={i.id} className="p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex flex-col md:flex-row justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-bold text-slate-800 dark:text-white text-lg">{i.name}</h4>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold">{i.department}</span>
+                        </div>
+                        <p className="text-sm text-slate-500 mb-2"><strong>Task:</strong> {i.task_assigned || 'None assigned'}</p>
+                        <p className="text-sm text-slate-500"><strong>Skills:</strong> {i.skills}</p>
+                      </div>
+                      { !isAdmin && ( 
+<div className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 shrink-0">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Performance Rate</p>
+                        <div className="flex gap-1 justify-center">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <button 
+                              key={star} 
+                              onClick={() => handleUpdateInternRating(i.id, star)}
+                              className={`p-1 transition-colors \${(i.performance || 0) >= star ? 'text-yellow-400' : 'text-slate-200 dark:text-slate-700 hover:text-yellow-200'}`}
+                            >
+                              <Star size={20} fill={(i.performance || 0) >= star ? 'currentColor' : 'none'} />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+)}
+                    </div>
+                  ))
+                )}
+              </div>
             </motion.div>
           </div>
         )}

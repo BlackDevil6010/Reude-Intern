@@ -1,0 +1,1 @@
+const fs = require('fs'); let c = fs.readFileSync('c:/Users/Admin/Downloads/New folder (2)/reude-erp/frontend/src/pages/Interns.jsx', 'utf8'); c = c.replace(/<label className="cursor-pointer bg-white dark:bg-slate-800[\s\S]*?<\/label>\s*/, ''); fs.writeFileSync('c:/Users/Admin/Downloads/New folder (2)/reude-erp/frontend/src/pages/Interns.jsx', c);

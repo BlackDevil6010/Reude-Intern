@@ -54,6 +54,30 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      <div className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 p-6 rounded-[2rem] shadow-xl shadow-slate-200/40 dark:shadow-none mb-6">
+        <h3 className="font-bold text-lg mb-5 text-slate-800 dark:text-white">Profile & Security</h3>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+          Manage your personal details and account security settings.
+        </p>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Full Name</label>
+            <input type="text" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:border-reude text-slate-800 dark:text-white" defaultValue="Deepak Raj" />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Email</label>
+            <input type="email" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:border-reude text-slate-800 dark:text-white" defaultValue="deepak@reude.tech" />
+          </div>
+        </div>
+        <div className="mt-4">
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Change Password</label>
+          <div className="flex gap-4">
+            <input type="password" placeholder="New Password" className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-reude text-slate-800 dark:text-white" />
+            <button className="bg-gradient-to-r from-orange-500 to-reude text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition-all hover:-translate-y-0.5">Update</button>
+          </div>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
         {['Company Information', 'User Management', 'Roles & Permissions', 'Departments', 'Audit Logs'].map(x => (
           <div className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 p-5 rounded-2xl flex items-center justify-between hover:-translate-y-1 transition-transform cursor-pointer" key={x}>

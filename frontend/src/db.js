@@ -1,7 +1,8 @@
 const INITIAL_DATA = {
-  version: 4, // Bump version to force reset localstorage
+  version: 7, // Bump version to force reset localstorage
   users: [
     { id: '1', username: 'Deepak Raj', role: 'Employee', display: 'Deepak Raj', status: 'Active' },
+    { id: '2', username: 'Kandan V', role: 'Employee', display: 'Kandan V', status: 'Active' },
     { id: 'admin', username: 'admin', role: 'Admin', display: 'System Admin', status: 'Active' }
   ],
   employees: [
@@ -42,15 +43,53 @@ const INITIAL_DATA = {
       username: "Deepak Raj",
       role: "Employee",
       account_status: "Active"
+    },
+    {
+      id: 2,
+      user_id: 3,
+      employee_id: "RE00021",
+      first_name: "Kandan",
+      middle_name: "",
+      last_name: "V",
+      gender: "Male",
+      date_of_birth: "2000-10-19",
+      personal_email: "kandanvadivel222@gmail.com",
+      work_email: "kandan.vadivel@reude.tech",
+      mobile_number: "7358689488",
+      alternate_mobile: "",
+      profile_photo_url: null,
+      address_line_1: "No.5, 5th Street, 3rd cross street",
+      address_line_2: "Vijayaragavapuram",
+      city: "Chennai",
+      state: "Tamilnadu",
+      postal_code: "600093",
+      country: "INDIA",
+      department: "IT & SOFTWARE DEVELOPMENT",
+      designation: "Software Engineer",
+      employment_type: "Full-time",
+      joining_date: "2025-09-01",
+      employment_status: "Permanent",
+      reporting_manager_id: "KEERTHANA RADHAKRISHNAN, RAJESH KUMAR BALARAMAN",
+      work_location: "CHENNAI",
+      work_shift: "morning",
+      highest_qualification: "B TECH",
+      years_of_experience: "1yr",
+      skills: "AI & DS",
+      emergency_contact_name: "",
+      emergency_contact_relationship: "",
+      emergency_contact_number: "",
+      username: "Kandan V",
+      role: "Employee",
+      account_status: "Active"
     }
   ],
   interns: [
-    { id: 1, intern_id: "INT001", name: "Priyadharshini", department: "Full Stack Developer intern", status: "Active", email: "32priyadharshini@gmail.com", skills: "HTML, Git", duration: "3 months", working_mode: "remote", place: "Coimbatore", supervisor: "Deepak Raj", task_assigned: "Sales and inventory", start_date: "2026-09-01", end_date: "2026-12-01" },
-    { id: 2, intern_id: "INT002", name: "Yugeswaran", department: "Full Stack Developer intern", status: "Active", email: "yugeshdhanasekaran@gmail.com", skills: "React.js", duration: "3 months", working_mode: "onsite", place: "Chennai", supervisor: "Deepak Raj", task_assigned: "Build user dashboard", start_date: "2026-08-15", end_date: "2026-11-15" },
-    { id: 3, intern_id: "INT003", name: "Dhanushraj", department: "Full Stack Developer intern", status: "Active", email: "dhanushrajshiva123@gmail.com", skills: "React.js", duration: "3 months", working_mode: "hybrid", place: "Bangalore", supervisor: "Deepak Raj", task_assigned: "API integration", start_date: "2026-09-10", end_date: "2026-12-10" },
-    { id: 4, intern_id: "INT004", name: "Kavin Kumar", department: "Full Stack Developer intern", status: "Active", email: "kavinkumars.tech@gmail.com", skills: "React, Python, Java, SQL, MongoDB, Git", duration: "3 months", working_mode: "remote", place: "Coimbatore", supervisor: "Deepak Raj", task_assigned: "Database schema design", start_date: "2026-07-01", end_date: "2026-10-01" },
-    { id: 5, intern_id: "INT005", name: "Karthikeyan", department: "Full Stack Developer intern", status: "Active", email: "karthikeyan2430s@gmail.com", skills: "Git", duration: "3 months", working_mode: "onsite", place: "Chennai", supervisor: "Deepak Raj", task_assigned: "Bug fixing", start_date: "2026-09-20", end_date: "2026-12-20" },
-    { id: 6, intern_id: "INT006", name: "Sugapriya", department: "Full Stack Developer intern", status: "Active", email: "sugapriyaarivalagan@gmail.com", skills: "React.js", duration: "3 months", working_mode: "remote", place: "Madurai", supervisor: "Deepak Raj", task_assigned: "Component styling", start_date: "2026-09-05", end_date: "2026-12-05" }
+    { id: 1, intern_id: "INT001", name: "Priyadharshini", department: "Full Stack Developer intern", status: "Active", email: "32priyadharshini@gmail.com", skills: "HTML, Git", duration: "3 months", working_mode: "remote", place: "Coimbatore", supervisor: "Deepak Raj", task_assigned: "Sales and inventory", start_date: "2026-09-01", end_date: "2026-12-01", dob: "2004-05-15", gender: "Female" },
+    { id: 2, intern_id: "INT002", name: "Yugeswaran", department: "Full Stack Developer intern", status: "Active", email: "yugeshdhanasekaran@gmail.com", skills: "React.js", duration: "3 months", working_mode: "onsite", place: "Chennai", supervisor: "Deepak Raj", task_assigned: "Build user dashboard", start_date: "2026-08-15", end_date: "2026-11-15", dob: "2003-11-20", gender: "Male" },
+    { id: 3, intern_id: "INT003", name: "Dhanushraj", department: "Full Stack Developer intern", status: "Active", email: "dhanushrajshiva123@gmail.com", skills: "React.js", duration: "3 months", working_mode: "hybrid", place: "Bangalore", supervisor: "Deepak Raj", task_assigned: "API integration", start_date: "2026-09-10", end_date: "2026-12-10", dob: "2004-02-10", gender: "Male" },
+    { id: 4, intern_id: "INT004", name: "Kavin Kumar", department: "Full Stack Developer intern", status: "Active", email: "kavinkumars.tech@gmail.com", skills: "React, Python, Java, SQL, MongoDB, Git", duration: "3 months", working_mode: "remote", place: "Coimbatore", supervisor: "Deepak Raj", task_assigned: "Database schema design", start_date: "2026-07-01", end_date: "2026-10-01", dob: "2003-08-05", gender: "Male" },
+    { id: 5, intern_id: "INT005", name: "Karthikeyan", department: "Full Stack Developer intern", status: "Active", email: "karthikeyan2430s@gmail.com", skills: "Git", duration: "3 months", working_mode: "onsite", place: "Chennai", supervisor: "Deepak Raj", task_assigned: "Bug fixing", start_date: "2026-09-20", end_date: "2026-12-20", dob: "2002-12-12", gender: "Male" },
+    { id: 6, intern_id: "INT006", name: "Sugapriya", department: "Full Stack Developer intern", status: "Active", email: "sugapriyaarivalagan@gmail.com", skills: "React.js", duration: "3 months", working_mode: "remote", place: "Madurai", supervisor: "Deepak Raj", task_assigned: "Component styling", start_date: "2026-09-05", end_date: "2026-12-05", dob: "2004-07-22", gender: "Female" }
   ],
   activity: [
     { id: 1, username: 'Deepak Raj', action: 'Logged into the system', created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString() },
@@ -106,10 +145,10 @@ export const db = {
   },
   login(user, pass) {
     if (user === 'admin' && (pass === 'Reude@Admin$2026' || pass === 'ChangeMe!2026')) {
-      return { token: 'mock-jwt-token-admin', user: INITIAL_DATA.users[1] };
+      return { token: 'mock-jwt-token-admin', user: INITIAL_DATA.users.find(u => u.username === 'admin') };
     }
     const emp = this.getData().employees.find(e => e.first_name.toLowerCase() === user.toLowerCase());
-    if (emp && pass === 'password') {
+    if (emp && (pass === 'password' || pass === 'ChangeMe!2026')) {
       return { token: 'mock-jwt-token-emp', user: { id: emp.id, username: emp.first_name, role: 'Employee' } };
     }
     throw new Error('Invalid credentials');
