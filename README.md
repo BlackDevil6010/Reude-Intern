@@ -67,7 +67,7 @@ JWT_EXPIRES_IN=8h
 `npm run seed` creates an admin account from environment variables if present, otherwise:
 
 - username: `admin`
-- password: `ChangeMe!2026`
+- password: `Reude@Admin$2026`
 
 Change it immediately in production.
 

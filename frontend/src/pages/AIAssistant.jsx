@@ -7,7 +7,7 @@ import Section from '../components/Section';
 
 export default function AIAssistant() {
   const [messages, setMessages] = useState([
-    { role: 'assistant', type: 'text', content: 'Hello! I am your REUDE AI Assistant. Ask me to "show a chart" or "employee breakdown" for a rich response, or anything else.' }
+    { role: 'assistant', type: 'text', content: 'Hello! I am your REUDE AI Assistant. You can ask me to "show a chart", tell a "joke", "define [word]", calculate math, or ask me any general knowledge question!' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ export default function AIAssistant() {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, loading]);
 
   const send = async e => {
     e.preventDefault();
@@ -27,10 +27,13 @@ export default function AIAssistant() {
     setMessages(prev => [...prev, { role: 'user', type: 'text', content: msg }]);
     setLoading(true);
 
-    setTimeout(() => {
-      if (msg.toLowerCase().includes('chart') || msg.toLowerCase().includes('breakdown')) {
+    const m = msg.toLowerCase();
+    let reply = { role: 'assistant', type: 'text', content: '' };
+
+    try {
+      if (m.includes('chart') || m.includes('breakdown')) {
         const d = db.getDashboard();
-        setMessages(prev => [...prev, { 
+        reply = { 
           role: 'assistant', 
           type: 'chart', 
           content: 'Here is the current workforce breakdown:',
@@ -39,16 +42,50 @@ export default function AIAssistant() {
             { name: 'On Leave', value: d.kpis.leave },
             { name: 'Interns', value: d.kpis.interns }
           ]
-        }]);
+        };
+      } else if (m.includes('joke')) {
+        const res = await fetch('https://official-joke-api.appspot.com/random_joke');
+        const data = await res.json();
+        reply.content = `${data.setup}\n\n...${data.punchline} 😂`;
+      } else if (m.includes('dog') || m.includes('puppy')) {
+        const res = await fetch('https://dog.ceo/api/breeds/image/random');
+        const data = await res.json();
+        reply = { role: 'assistant', type: 'image', content: "Here is a cute dog to brighten your day!", url: data.message };
+      } else if (m.includes('time') || m.includes('date')) {
+        reply.content = `It is currently ${new Date().toLocaleString()}`;
+      } else if (m.startsWith('calculate ') || m.startsWith('math ')) {
+        const exp = m.replace(/calculate|math/gi, '').trim();
+        const result = new Function('return ' + exp)();
+        reply.content = `The result is **${result}**`;
+      } else if (m.startsWith('define ')) {
+        const word = m.split(' ')[1];
+        const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+        const data = await res.json();
+        reply.content = `**${word}**: ${data[0].meanings[0].definitions[0].definition}`;
+      } else if (m.includes('how many interns')) {
+        reply.content = `We currently have ${db.getInterns().length} interns in the system.`;
+      } else if (m.includes('how many employees')) {
+        reply.content = `We currently have ${db.getEmployees().length} employees in the system.`;
+      } else if (m.includes('who are you') || m.includes('what are you')) {
+        reply.content = "I am REUDE AI, your personal ERP assistant! I can calculate things, define words, tell jokes, search the web for facts, and help you manage your workforce.";
+      } else if (m.includes('hello') || m.includes('hi')) {
+        reply.content = "Hello there! How can I assist you with your work today?";
       } else {
-        setMessages(prev => [...prev, { 
-          role: 'assistant', 
-          type: 'text', 
-          content: 'I understand you are asking about: ' + msg + '. As an AI, I am here to help you manage REUDE operations.' 
-        }]);
+        // Fallback to Wikipedia for general knowledge
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(m)}`);
+        if (res.ok) {
+          const data = await res.json();
+          reply.content = data.extract || `I found a topic, but there is no summary available.`;
+        } else {
+          reply.content = `I'm sorry, I don't know much about "${msg}". Try asking me to define a word, tell a joke, do some math, or check our ERP data!`;
+        }
       }
-      setLoading(false);
-    }, 1000);
+    } catch (err) {
+      reply.content = `I couldn't quite process that right now. Could you rephrase?`;
+    }
+
+    setMessages(prev => [...prev, reply]);
+    setLoading(false);
   };
 
   const renderChart = (data) => {
@@ -58,7 +95,7 @@ export default function AIAssistant() {
         <ResponsiveContainer>
           <PieChart>
             <Pie data={data} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={5} dataKey="value">
-              {data.map((entry, index) => <Cell key={`cell-\${index}`} fill={COLORS[index % COLORS.length]} />)}
+              {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
             </Pie>
             <RechartsTooltip contentStyle={{borderRadius: '12px', border: 'none', backgroundColor: '#1e293b', color: 'white'}} />
           </PieChart>
@@ -72,13 +109,16 @@ export default function AIAssistant() {
       <div className="p-6 relative z-10 bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border-b border-slate-200/50 dark:border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-5">
           <div className="relative">
-            <div className="w-14 h-14 bg-gradient-to-tr from-slate-900 to-slate-800 rounded-2xl flex items-center justify-center relative shadow-xl border border-slate-700">
-              <Sparkles className="text-orange-400" size={26}/>
+            <div className="w-14 h-14 bg-gradient-to-tr from-orange-500 to-reude rounded-2xl flex items-center justify-center relative shadow-xl shadow-orange-500/30">
+              <Sparkles className="text-white" size={26}/>
             </div>
           </div>
           <div>
             <h2 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-reude tracking-tight mb-0.5">REUDE AI</h2>
-            <p className="text-emerald-500 text-sm font-medium">Online & Ready</p>
+            <p className="text-emerald-500 text-sm font-bold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Online & Ready
+            </p>
           </div>
         </div>
       </div>
@@ -86,26 +126,27 @@ export default function AIAssistant() {
       <div ref={chatRef} className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8 scroll-smooth">
         {messages.map((m, i) => (
           <motion.div initial={{ opacity: 0, x: m.role === 'user' ? 20 : -20 }} animate={{ opacity: 1, x: 0 }} key={i} className={`flex gap-4 max-w-[85%] lg:max-w-[75%] ${m.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
-            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${m.role === 'user' ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' : 'bg-gradient-to-tr from-slate-900 to-slate-800 text-white'}`}>
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${m.role === 'user' ? 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700' : 'bg-gradient-to-br from-orange-500 to-reude text-white shadow-orange-500/30'}`}>
               {m.role === 'user' ? <Users size={20}/> : <Bot size={20}/>}
             </div>
             
             {m.role === 'user' ? (
-              <div className="p-5 shadow-sm text-[15px] bg-gradient-to-br from-orange-400 to-reude text-white rounded-[2rem] rounded-tr-sm">
+              <div className="p-5 shadow-sm text-[15px] bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-[2rem] rounded-tr-sm">
                 <div className="whitespace-pre-wrap">{m.content}</div>
               </div>
             ) : (
-              <div className="p-5 shadow-sm text-[15px] bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 rounded-[2rem] rounded-tl-sm">
-                <div className="whitespace-pre-wrap">{m.content}</div>
+              <div className="p-5 shadow-xl text-[15px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 rounded-[2rem] rounded-tl-sm">
+                <div className="whitespace-pre-wrap leading-relaxed">{m.content}</div>
                 {m.type === 'chart' && renderChart(m.data)}
+                {m.type === 'image' && <img src={m.url} alt="AI response" className="mt-4 rounded-xl max-w-full h-auto shadow-md" />}
               </div>
             )}
           </motion.div>
         ))}
         {loading && (
           <div className="flex gap-4 max-w-[85%]">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-800 text-white flex items-center justify-center flex-shrink-0 shadow-lg"><Bot size={20}/></div>
-            <div className="p-6 rounded-[2rem] rounded-tl-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-md flex gap-2 items-center">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-500 to-reude text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/30"><Bot size={20}/></div>
+            <div className="p-6 rounded-[2rem] rounded-tl-sm bg-white/90 dark:bg-slate-800/90 backdrop-blur-md flex gap-2 items-center shadow-xl border border-slate-200/50 dark:border-slate-700/50">
               <span className="w-2.5 h-2.5 bg-orange-400 rounded-full animate-bounce"/>
               <span className="w-2.5 h-2.5 bg-orange-400 rounded-full animate-bounce delay-150"/>
               <span className="w-2.5 h-2.5 bg-orange-400 rounded-full animate-bounce delay-300"/>
@@ -119,11 +160,11 @@ export default function AIAssistant() {
           <input 
             value={input} 
             onChange={e=>setInput(e.target.value)} 
-            placeholder="Ask REUDE AI to show a chart or breakdown..." 
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-full py-4 pl-6 pr-16 focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 text-slate-800 dark:text-slate-100" 
+            placeholder="Ask REUDE AI anything..." 
+            className="input rounded-full py-4 pl-6 pr-16" 
             disabled={loading}
           />
-          <button type="submit" disabled={loading||!input.trim()} className="absolute right-2.5 w-12 h-12 bg-gradient-to-br from-orange-400 to-reude text-white rounded-full flex items-center justify-center disabled:opacity-50">
+          <button type="submit" disabled={loading||!input.trim()} className="absolute right-2.5 w-12 h-12 bg-gradient-to-br from-orange-500 to-reude text-white rounded-full flex items-center justify-center disabled:opacity-50 shadow-lg shadow-orange-500/20 hover:scale-105 transition-transform">
             <Send size={18} />
           </button>
         </form>

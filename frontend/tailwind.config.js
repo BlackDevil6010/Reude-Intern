@@ -1,1 +1,27 @@
-export default {content:['./index.html','./src/**/*.{js,jsx}'],darkMode:'class',theme:{extend:{colors:{reude:'#F46900',charcoal:'#20242A'}}},plugins:[]}
+export default {
+  content: ['./index.html', './src/**/*.{js,jsx}'],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        reude: '#F46900',
+        charcoal: '#20242A'
+      },
+      animation: {
+        'blob': 'blob 7s infinite',
+      },
+      keyframes: {
+        blob: {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        }
+      }
+    }
+  },
+  plugins: []
+}

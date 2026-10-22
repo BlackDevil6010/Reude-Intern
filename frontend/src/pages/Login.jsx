@@ -54,10 +54,10 @@ export default function Login({ onLogin }) {
           </div>
           <div>
             <h2 className="text-4xl font-black mb-6 tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-reude">
-              Admin<br/>Portal
+              Admin, Management<br/>& Employee Portal
             </h2>
             <p className="text-lg text-slate-300 leading-relaxed font-light">
-              Secure access to REUDE TECHNOLOGIES administrative controls and operational oversight.
+              Secure role-based workspace for administration, executive management, and workforce operations.
             </p>
           </div>
           <div className="flex gap-2">
@@ -75,7 +75,7 @@ export default function Login({ onLogin }) {
             
             <div className="mb-10">
               <h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-3">Welcome back</h1>
-              <p className="text-slate-500 text-lg">Please enter your credentials (admin/password).</p>
+              <p className="text-slate-500 text-lg">Enter your credentials (admin, management, or employee name).</p>
             </div>
 
             {err && (
@@ -90,7 +90,7 @@ export default function Login({ onLogin }) {
                 <label className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-2">Username</label>
                 <input 
                   className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-4 focus:outline-none focus:border-reude focus:ring-4 focus:ring-orange-500/10 transition-all text-slate-800 dark:text-white font-medium" 
-                  placeholder="admin" 
+                  placeholder="e.g. admin, management, or Deepak" 
                   value={f.username} 
                   onChange={e => setF({ ...f, username: e.target.value })} 
                 />

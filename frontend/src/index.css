@@ -1,2 +1,68 @@
-@tailwind base;@tailwind components;@tailwind utilities;
-body{margin:0;@apply bg-slate-50 text-slate-800 dark:bg-[#0f172a] dark:text-slate-200 transition-colors duration-300;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.card{@apply bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors duration-300}.btn{@apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition}.btn-primary{@apply btn bg-reude text-white hover:opacity-90 shadow-lg shadow-reude/30}.btn-muted{@apply btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600}.input{@apply w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 outline-none focus:border-reude focus:ring-2 focus:ring-orange-100 dark:focus:ring-reude/20 text-slate-800 dark:text-slate-100 transition-colors duration-300}.badge{@apply inline-flex rounded-full px-2.5 py-1 text-xs font-semibold}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    margin: 0;
+    @apply bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200 transition-colors duration-300 min-h-screen relative overflow-x-hidden;
+  }
+
+  /* Beautiful glowing background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: -10%;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, theme(colors.orange.500/0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+    animation: blob 7s infinite;
+    @apply dark:bg-[radial-gradient(circle,theme(colors.orange.500/0.05)_0%,transparent_70%)];
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -20%;
+    right: -10%;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, theme(colors.teal.500/0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+    animation: blob 7s infinite;
+    animation-delay: 2s;
+    @apply dark:bg-[radial-gradient(circle,theme(colors.teal.500/0.05)_0%,transparent_70%)];
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-slate-200/50 dark:border-white/10 shadow-xl shadow-slate-200/30 dark:shadow-none transition-all duration-300;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all;
+  }
+
+  .btn-primary {
+    @apply btn bg-gradient-to-r from-orange-500 to-reude text-white hover:opacity-90 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40;
+  }
+
+  .btn-muted {
+    @apply btn bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 px-4 py-3 outline-none focus:border-reude focus:ring-2 focus:ring-orange-500/20 text-sm font-medium text-slate-800 dark:text-white transition-all duration-300;
+  }
+
+  .badge {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-bold;
+  }
+}
