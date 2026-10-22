@@ -15,7 +15,9 @@ import {
 
 export default function Employees() {
   const user = JSON.parse(localStorage.getItem('reude_user') || '{}');
-  const isAdmin = ['Admin', 'HR', 'Manager', 'Team Lead'].includes(user?.role);
+  const isAdmin = user?.role === 'Admin';
+  const isManagement = user?.role === 'Management';
+  const canManage = isAdmin || isManagement;
   const [data, setData] = useState([]);
   const [searchParams] = useSearchParams();
   const [globalFilter, setGlobalFilter] = useState(searchParams.get('status') || '');
@@ -148,6 +150,7 @@ export default function Employees() {
       title="Employees" 
       subtitle="Manage your workforce data using TanStack Table." 
       action={
+        isAdmin && (
         <div className="flex gap-3">
           <label className="cursor-pointer px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2">
             <Upload size={18}/> Upload Excel
@@ -159,8 +162,8 @@ export default function Employees() {
             <Plus size={18}/> Add Employee
           </button>
         </div>
-      }
-    >
+        )
+      }>
       <div className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 p-6 rounded-[2rem] shadow-xl shadow-slate-200/40 dark:shadow-none">
         
         <div className="relative max-w-md mb-6">

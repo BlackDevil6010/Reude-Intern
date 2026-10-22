@@ -6,7 +6,9 @@ import Section from '../components/Section';
 
 export default function Interns() {
   const user = JSON.parse(localStorage.getItem('reude_user') || '{}');
-  const isAdmin = ['Admin', 'HR', 'Manager', 'Team Lead'].includes(user?.role);
+  const isAdmin = user?.role === 'Admin';
+  const isManagement = user?.role === 'Management';
+  const canManage = isAdmin || isManagement;
   const [rows, setRows] = useState([]);
   const [editing, setEditing] = useState(null);
   const [adding, setAdding] = useState(false);
@@ -69,7 +71,7 @@ export default function Interns() {
       title="Intern Management" 
       subtitle="Comprehensive tracking, performance, and conversion workflow."
       action={
-        isAdmin && (
+        canManage && (
         <div className="flex gap-3">
           <button onClick={() => setAdding(true)} className="btn-primary"><Plus size={18}/> Add Intern</button>
         </div>
@@ -128,7 +130,7 @@ export default function Interns() {
                 )}
               </div>
               
-              {isAdmin && (
+              {canManage && (
                 <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center gap-2 flex-wrap">
                                   <label className="cursor-pointer flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10">
                     <Upload size={14} /> Resume

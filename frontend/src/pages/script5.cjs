@@ -1,1 +1,0 @@
-const fs = require('fs'); let c = fs.readFileSync('c:/Users/Admin/Downloads/New folder (2)/reude-erp/frontend/src/pages/Interns.jsx', 'utf8'); c = c.replace(/\\n/g, '\n').replace(/\\'/g, '); fs.writeFileSync('c:/Users/Admin/Downloads/New folder (2)/reude-erp/frontend/src/pages/Interns.jsx', c);
