@@ -21,7 +21,16 @@ const INITIAL_PERMISSIONS = [
   { id: 'self.documents', module: 'Self-Service', label: 'Sign & View Personal Documents' },
   { id: 'self.leave', module: 'Self-Service', label: 'Apply & Track Personal Leave' },
   { id: 'self.requests', module: 'Self-Service', label: 'Submit HR Letter Requests' },
-  { id: 'self.payslips', module: 'Self-Service', label: 'View Personal Payslips' }
+  { id: 'self.payslips', module: 'Self-Service', label: 'View Personal Payslips' },
+  { id: 'attendance.view', module: 'Workforce', label: 'View Attendance Records & Punch Logs' },
+  { id: 'attendance.manage', module: 'Workforce', label: 'Manage Shifts & Override Attendance' },
+  { id: 'certificates.generate', module: 'Workflow', label: 'Generate & Sign Official Certificates' },
+  { id: 'performance.view', module: 'Performance', label: 'View OKRs & Appraisals' },
+  { id: 'performance.manage', module: 'Performance', label: 'Conduct Appraisals & Create Goals' },
+  { id: 'expenses.submit', module: 'Self-Service', label: 'Submit Expense Reimbursement Claims' },
+  { id: 'expenses.manage', module: 'Finance', label: 'Review & Approve Expense Claims' },
+  { id: 'recruiter.ai', module: 'AI Tools', label: 'AI Resume & JD Matching Engine' },
+  { id: 'assets.manage', module: 'Operations', label: 'Inventory & Equipment Asset Tracking' }
 ];
 
 const INITIAL_ROLE_PERMISSIONS = {
@@ -29,19 +38,19 @@ const INITIAL_ROLE_PERMISSIONS = {
     'roles.manage', 'users.manage', 'audit.view', 'approvals.manage', 
     'reports.export', 'settings.manage', 'data.import', 'workforce.edit', 
     'interns.edit', 'approvals.act', 'self.profile', 'self.documents', 
-    'self.leave', 'self.requests', 'self.payslips'
+    'self.leave', 'self.requests', 'self.payslips', 'attendance.manage', 'attendance.view', 'certificates.generate', 'performance.manage', 'performance.view', 'expenses.manage', 'recruiter.ai', 'assets.manage'
   ],
   Management: [
     'reports.export', 'approvals.act', 'self.profile', 'self.documents', 
-    'self.leave', 'self.requests', 'self.payslips'
+    'self.leave', 'self.requests', 'self.payslips', 'attendance.view', 'attendance.manage', 'certificates.generate', 'performance.manage', 'performance.view', 'expenses.manage', 'recruiter.ai', 'assets.manage'
   ],
   Employee: [
-    'self.profile', 'self.documents', 'self.leave', 'self.requests', 'self.payslips'
+    'self.profile', 'self.documents', 'self.leave', 'self.requests', 'self.payslips', 'attendance.view', 'performance.view', 'expenses.submit'
   ]
 };
 
 const INITIAL_DATA = {
-  version: 9, // Incremented to version 9 for RBAC, Self-Service, Approvals, Audit & Reports
+  version: 10, // Incremented to version 9 for RBAC, Self-Service, Approvals, Audit & Reports
   roles: INITIAL_ROLES,
   permissions: INITIAL_PERMISSIONS,
   role_permissions: INITIAL_ROLE_PERMISSIONS,
@@ -224,6 +233,39 @@ const INITIAL_DATA = {
     { id: 1, user_id: '1', month: 'September 2026', basic: 45000, hra: 18000, allowances: 7000, deductions: 2500, net: 67500, paid_date: '2026-09-30' },
     { id: 2, user_id: '1', month: 'August 2026', basic: 45000, hra: 18000, allowances: 7000, deductions: 2500, net: 67500, paid_date: '2026-08-31' },
     { id: 3, user_id: '2', month: 'September 2026', basic: 48000, hra: 19000, allowances: 8000, deductions: 2800, net: 72200, paid_date: '2026-09-30' }
+  ],
+
+  attendance: [
+    { id: 1, user_id: '1', employee_name: 'Deepak Raj', date: '2026-11-03', punch_in: '09:02 AM', punch_out: null, status: 'Present', shift: 'Day shift (9am-6pm)', total_hours: 'Working...', breaks: [] },
+    { id: 2, user_id: '2', employee_name: 'Kandan V', date: '2026-11-03', punch_in: '08:55 AM', punch_out: '06:05 PM', status: 'Present', shift: 'Morning shift', total_hours: '9h 10m', breaks: [{ start: '01:00 PM', end: '01:45 PM' }] },
+    { id: 3, user_id: '1', employee_name: 'Deepak Raj', date: '2026-11-02', punch_in: '09:05 AM', punch_out: '06:10 PM', status: 'Present', shift: 'Day shift (9am-6pm)', total_hours: '9h 05m', breaks: [] },
+    { id: 4, user_id: '2', employee_name: 'Kandan V', date: '2026-11-02', punch_in: '08:58 AM', punch_out: '06:00 PM', status: 'Present', shift: 'Morning shift', total_hours: '9h 02m', breaks: [] }
+  ],
+  expenses: [
+    { id: 1, user_id: '1', employee_name: 'Deepak Raj', title: 'Aero-Acoustics Lab Drone Parts', category: 'Hardware/Tools', amount: 4850, date: '2026-11-01', status: 'Approved', receipt_name: 'skyrob_invoice_902.pdf', manager_comment: 'Approved for R&D testing site' },
+    { id: 2, user_id: '2', employee_name: 'Kandan V', title: 'Cloud Database Cluster Monthly Subscription', category: 'Software/Cloud', amount: 3200, date: '2026-11-02', status: 'Pending', receipt_name: 'aws_cluster_invoice.pdf', manager_comment: '' },
+    { id: 3, user_id: '1', employee_name: 'Deepak Raj', title: 'Client Travel to Chennai Airport Test Flight', category: 'Travel', amount: 1450, date: '2026-11-03', status: 'Pending', receipt_name: 'uber_receipt_chennai.pdf', manager_comment: '' }
+  ],
+  okrs: [
+    { id: 1, user_id: '1', employee_name: 'Deepak Raj', title: 'Aero Propeller Noise Reduction by 15%', progress: 80, quarter: 'Q4 2026', status: 'On Track', category: 'R&D Engineering' },
+    { id: 2, user_id: '2', employee_name: 'Kandan V', title: 'Complete ERP RBAC & Document Engine', progress: 95, quarter: 'Q4 2026', status: 'Ahead', category: 'IT & Software' },
+    { id: 3, intern_id: 1, intern_name: 'Priyadharshini', title: 'Implement Sales & Inventory Module API', progress: 90, quarter: 'Q4 2026', status: 'Ahead', category: 'Full Stack' },
+    { id: 4, intern_id: 2, intern_name: 'Yugeswaran', title: 'Responsive User Dashboard UI Components', progress: 85, quarter: 'Q4 2026', status: 'On Track', category: 'Frontend' }
+  ],
+  appraisals: [
+    { id: 1, user_id: '1', employee_name: 'Deepak Raj', reviewer: 'Veerapradeepan M', rating: 4.8, cycle: 'Annual 2026', strengths: 'SolidWorks, Drone flight control, Rapid prototyping', feedback: 'Outstanding contribution to avionics sensor design.', promotion_recommendation: 'Senior Design Engineer' },
+    { id: 2, user_id: '2', employee_name: 'Kandan V', reviewer: 'Rajesh Kumar B', rating: 4.7, cycle: 'Annual 2026', strengths: 'AI/ML pipelines, Fullstack JS/React, Fast learner', feedback: 'Solid software engineering delivery across enterprise modules.', promotion_recommendation: 'Module Lead' }
+  ],
+  assets: [
+    { id: 'AST-001', name: 'Dell Precision 5570 CAD Workstation', category: 'Laptop / Workstation', serial: 'DP5570-9821-IN', assigned_to: 'Deepak Raj', assigned_date: '2025-11-05', status: 'Assigned', condition: 'Excellent', department: 'Engineering' },
+    { id: 'AST-002', name: 'MacBook Pro 16" M3 Max', category: 'Laptop', serial: 'MBP16-M3-4412-IN', assigned_to: 'Kandan V', assigned_date: '2025-09-02', status: 'Assigned', condition: 'Good', department: 'IT & SOFTWARE DEVELOPMENT' },
+    { id: 'AST-003', name: 'DJI Matrice 300 RTK Flight Controller Kit', category: 'Avionics Lab Kit', serial: 'DJI-M300-8802', assigned_to: 'Deepak Raj', assigned_date: '2026-01-10', status: 'Assigned', condition: 'Excellent', department: 'Engineering' },
+    { id: 'AST-004', name: 'FLIR Thermal Imaging Camera Sensor', category: 'Sensor/Hardware', serial: 'FLIR-TH-302', assigned_to: 'Unassigned (Lab Inventory)', assigned_date: null, status: 'In Lab Stock', condition: 'New', department: 'R&D Testing Lab' }
+  ],
+  job_descriptions: [
+    { id: 'JD-01', title: 'Flight Avionics Design Engineer', department: 'Engineering', required_skills: ['SolidWorks', 'Catia', 'AutoCAD', 'Drone Pilot', 'UAV', 'CFD'], experience: '1-3 years', description: 'Design mission-critical flight avionics and composite drone structures.' },
+    { id: 'JD-02', title: 'Full Stack Web & AI Systems Developer', department: 'IT & Software', required_skills: ['React', 'Node.js', 'Python', 'SQL', 'MongoDB', 'Tailwind', 'AI/ML'], experience: '1-2 years', description: 'Build enterprise ERP systems, generative AI logic, and realtime APIs.' },
+    { id: 'JD-03', title: 'Autonomous Drone Robotics Intern', department: 'R&D Lab', required_skills: ['Python', 'Git', 'Linux', 'ROS', 'C++'], experience: '0-1 year', description: 'Assist in testing sensor payloads, telemetry pipelines, and prop noise reduction.' }
   ],
   candidates: [
     { id: 1, name: 'Sanjay Krishnan', email: 'sanjay.k@example.com', role: 'Avionics Firmware Engineer', department: 'Engineering', stage: 'Technical Interview', score: 94, source: 'LinkedIn', applied_date: '2026-10-02' },
@@ -580,6 +622,173 @@ export const db = {
     const all = this.getData().notifications || [];
     if (!userId) return all;
     return all.filter(n => String(n.user_id) === String(userId) || n.user_id === 'all');
+  },
+
+
+  // Attendance & Punch Clock
+  getAttendance(userId) {
+    const all = this.getData().attendance || [];
+    if (!userId) return all;
+    return all.filter(a => String(a.user_id) === String(userId));
+  },
+
+  punchIn(userId, employeeName, shift = 'Day shift (9am-6pm)') {
+    const data = this.getData();
+    if (!data.attendance) data.attendance = [];
+    const today = new Date().toISOString().split('T')[0];
+    const existing = data.attendance.find(a => String(a.user_id) === String(userId) && a.date === today);
+    const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (existing) {
+      existing.punch_in = nowTime;
+      existing.status = 'Present';
+      existing.punch_out = null;
+      existing.total_hours = 'Working...';
+    } else {
+      data.attendance.unshift({
+        id: (data.attendance.length || 0) + 1,
+        user_id: String(userId),
+        employee_name: employeeName,
+        date: today,
+        punch_in: nowTime,
+        punch_out: null,
+        status: 'Present',
+        shift,
+        total_hours: 'Working...',
+        breaks: []
+      });
+    }
+    this.saveData(data);
+    this.logAudit(employeeName, 'ATTENDANCE_PUNCH_IN', 'Attendance', userId, '', nowTime);
+    return data.attendance;
+  },
+
+  punchOut(userId) {
+    const data = this.getData();
+    if (!data.attendance) data.attendance = [];
+    const today = new Date().toISOString().split('T')[0];
+    const record = data.attendance.find(a => String(a.user_id) === String(userId) && a.date === today);
+    const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (record) {
+      record.punch_out = nowTime;
+      record.total_hours = '8h 45m (Completed)';
+      this.saveData(data);
+      this.logAudit(record.employee_name, 'ATTENDANCE_PUNCH_OUT', 'Attendance', userId, record.punch_in, nowTime);
+    }
+    return data.attendance;
+  },
+
+  // Expenses & Claims
+  getExpenses(userId) {
+    const all = this.getData().expenses || [];
+    if (!userId) return all;
+    return all.filter(e => String(e.user_id) === String(userId));
+  },
+
+  submitExpense(expense, actor = 'Employee') {
+    const data = this.getData();
+    const item = {
+      ...expense,
+      id: (data.expenses?.length || 0) + 1,
+      status: 'Pending',
+      date: new Date().toISOString().split('T')[0],
+      manager_comment: ''
+    };
+    if (!data.expenses) data.expenses = [];
+    data.expenses.unshift(item);
+    this.saveData(data);
+    this.logAudit(actor, 'EXPENSE_SUBMITTED', 'Expense', item.id, '', `${item.amount} INR - ${item.title}`);
+    return data.expenses;
+  },
+
+  updateExpenseStatus(id, status, comment = '', actor = 'Management') {
+    const data = this.getData();
+    const item = (data.expenses || []).find(e => e.id === id);
+    if (item) {
+      const old = item.status;
+      item.status = status;
+      item.manager_comment = comment;
+      this.saveData(data);
+      this.logAudit(actor, 'EXPENSE_STATUS_UPDATE', 'Expense', id, old, status);
+    }
+    return data.expenses;
+  },
+
+  // Performance & OKRs
+  getOKRs(userId) {
+    const all = this.getData().okrs || [];
+    if (!userId) return all;
+    return all.filter(o => String(o.user_id) === String(userId));
+  },
+
+  addOKR(okr, actor = 'Management') {
+    const data = this.getData();
+    const newOKR = { ...okr, id: (data.okrs?.length || 0) + 1 };
+    if (!data.okrs) data.okrs = [];
+    data.okrs.unshift(newOKR);
+    this.saveData(data);
+    this.logAudit(actor, 'OKR_CREATED', 'OKR', newOKR.id, '', newOKR.title);
+    return data.okrs;
+  },
+
+  updateOKRProgress(id, progress, actor = 'Employee') {
+    const data = this.getData();
+    const item = (data.okrs || []).find(o => o.id === id);
+    if (item) {
+      const old = item.progress;
+      item.progress = Number(progress);
+      if (item.progress >= 100) item.status = 'Completed';
+      else if (item.progress >= 70) item.status = 'On Track';
+      else item.status = 'Needs Attention';
+      this.saveData(data);
+      this.logAudit(actor, 'OKR_PROGRESS_UPDATE', 'OKR', id, `${old}%`, `${item.progress}%`);
+    }
+    return data.okrs;
+  },
+
+  getAppraisals() {
+    return this.getData().appraisals || [];
+  },
+
+  addAppraisal(appraisal, actor = 'Management') {
+    const data = this.getData();
+    const item = { ...appraisal, id: (data.appraisals?.length || 0) + 1 };
+    if (!data.appraisals) data.appraisals = [];
+    data.appraisals.unshift(item);
+    this.saveData(data);
+    this.logAudit(actor, 'APPRAISAL_RECORDED', 'Appraisal', item.id, '', `${item.employee_name}: ${item.rating}/5`);
+    return data.appraisals;
+  },
+
+  // Asset Inventory Management
+  getAssets() {
+    return this.getData().assets || [];
+  },
+
+  addAsset(asset, actor = 'Admin') {
+    const data = this.getData();
+    const id = `AST-${String((data.assets?.length || 0) + 1).padStart(3, '0')}`;
+    const item = { ...asset, id };
+    if (!data.assets) data.assets = [];
+    data.assets.push(item);
+    this.saveData(data);
+    this.logAudit(actor, 'ASSET_CREATED', 'Asset', id, '', item.name);
+    return data.assets;
+  },
+
+  updateAsset(id, updates, actor = 'Admin') {
+    const data = this.getData();
+    const item = (data.assets || []).find(a => a.id === id);
+    if (item) {
+      Object.assign(item, updates);
+      this.saveData(data);
+      this.logAudit(actor, 'ASSET_UPDATED', 'Asset', id, '', JSON.stringify(updates));
+    }
+    return data.assets;
+  },
+
+  // Job Descriptions & AI Recruiter
+  getJobDescriptions() {
+    return this.getData().job_descriptions || [];
   },
 
   // Auth, Employees, Interns & Tasks

@@ -3,7 +3,8 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, GraduationCap, Sparkles, Settings, LogOut, 
   Menu, X, Bell, ClipboardList, Megaphone, Shield, UserCheck, 
-  FileCheck, BarChart3, Database, Briefcase, ExternalLink, User
+  FileCheck, BarChart3, Database, Briefcase, ExternalLink, User,
+  Clock, Award, Target, CreditCard, Bot, Laptop
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/ThemeToggle';
@@ -23,6 +24,12 @@ export default function Layout({ user, logout, isDark, toggleDark }) {
     ['Dashboard', LayoutDashboard, '/'],
     ['Employees', Users, '/employees'],
     ['Interns', GraduationCap, '/interns'],
+    ['Attendance & Clock', Clock, '/attendance'],
+    ['AI Recruiter', Bot, '/ai-recruiter'],
+    ['Certificates & Letters', Award, '/certificates'],
+    ['Performance & OKRs', Target, '/performance'],
+    ['Expense Claims', CreditCard, '/expenses'],
+    ['Asset Inventory', Laptop, '/assets'],
     ['Roles & Permissions', Shield, '/roles'],
     ['User Management', UserCheck, '/users'],
     ['Audit Logs', ClipboardList, '/audit-logs'],
@@ -40,6 +47,12 @@ export default function Layout({ user, logout, isDark, toggleDark }) {
     ['Management Desk', Briefcase, '/management'],
     ['Employees', Users, '/employees'],
     ['Interns', GraduationCap, '/interns'],
+    ['Attendance & Clock', Clock, '/attendance'],
+    ['AI Recruiter', Bot, '/ai-recruiter'],
+    ['Certificates & Letters', Award, '/certificates'],
+    ['Performance & OKRs', Target, '/performance'],
+    ['Expense Claims', CreditCard, '/expenses'],
+    ['Asset Inventory', Laptop, '/assets'],
     ['Approvals', FileCheck, '/approvals'],
     ['Reports & Export', BarChart3, '/reports'],
     ['Tasks', ClipboardList, '/tasks'],
@@ -48,6 +61,9 @@ export default function Layout({ user, logout, isDark, toggleDark }) {
 
   const employeeNav = [
     ['My Self-Service', User, '/portal'],
+    ['Shift Attendance', Clock, '/attendance'],
+    ['OKRs & Goals', Target, '/performance'],
+    ['Expense Claims', CreditCard, '/expenses'],
     ['Employees Directory', Users, '/employees'],
     ['Interns', GraduationCap, '/interns'],
     ['Tasks', ClipboardList, '/tasks'],

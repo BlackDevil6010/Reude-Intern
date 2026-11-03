@@ -18,6 +18,12 @@ import Approvals from './pages/Approvals';
 import Reports from './pages/Reports';
 import DataControls from './pages/DataControls';
 import EmployeePortal from './pages/EmployeePortal';
+import Attendance from './pages/Attendance';
+import Certificates from './pages/Certificates';
+import Performance from './pages/Performance';
+import Expenses from './pages/Expenses';
+import AIRecruiter from './pages/AIRecruiter';
+import Assets from './pages/Assets';
 import { RequirePermission } from './hooks/usePermission';
 
 export default function App() {
@@ -77,6 +83,14 @@ export default function App() {
         <Route path="tasks" element={<Tasks />} />
         <Route path="announcements" element={<Announcements />} />
         
+        {/* New Workforce & Operational Modules */}
+        <Route path="attendance" element={<Attendance />} />
+        <Route path="certificates" element={<Certificates />} />
+        <Route path="performance" element={<Performance />} />
+        <Route path="expenses" element={<Expenses />} />
+        <Route path="ai-recruiter" element={<AIRecruiter />} />
+        <Route path="assets" element={<Assets />} />
+
         {/* Admin & Management Features */}
         <Route path="roles" element={
           <RequirePermission permission="roles.manage" fallback={<Navigate to="/" replace />}>
@@ -109,7 +123,7 @@ export default function App() {
           </RequirePermission>
         } />
 
-        {/* AI & Settings */}
+        {/* AI Assistant & Settings */}
         <Route path="assistant" element={<AIAssistant />} />
         <Route path="settings" element={<SettingsPage />} />
 
